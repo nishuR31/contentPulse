@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '5000:5000'
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongo:27017/contentpulse
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-change-in-production}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - contentpulse
+
+  mongo:
+    image: mongo:6.0-alpine
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - contentpulse
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - contentpulse
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  contentpulse:
